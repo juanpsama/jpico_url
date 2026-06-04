@@ -1,0 +1,68 @@
+from datetime import datetime, timezone
+from typing_extensions import Annotated
+
+from fastapi.params import Depends
+from sqlmodel import Session
+
+from app.core.db import get_db_session
+from app.models.url_map import UrlMap, UrlMapCreate, UrlMapPublic
+from app.services.base_service import BaseService
+from app.services.pg_error_handler import pg_error_handler
+
+BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+MAX_VAL = 62 ** 4  # 14776336
+PRIME = 748361
+
+class UrlMapService(BaseService[UrlMapPublic, UrlMapCreate, UrlMapCreate]):
+
+    """
+    Service class for managing URL mappings. Inherits from BaseService to provide
+    CRUD operations for the UrlMap model.
+    """
+
+    def __init__(self, db_session: Session):
+        super().__init__(UrlMap, db_session)
+
+    def _encode_base62(self, num: int) -> str:
+        """Encodes an integer into a 4-character Base62 string."""
+        if num == 0:
+            return BASE62_ALPHABET[0] * 4
+        
+        chars = []
+        while num > 0:
+            remainder = num % 62
+            chars.append(BASE62_ALPHABET[remainder])
+            num //= 62
+            
+        # Pad to exactly 4 characters
+        while len(chars) < 4:
+            chars.append(BASE62_ALPHABET[0])
+            
+        return "".join(reversed(chars))
+
+    def _generate_short_code(self, base_id: int) -> str:
+        """Generates a non-obvious short code using LCG."""
+        obfuscated_id = (base_id * PRIME) % MAX_VAL
+        return self._encode_base62(obfuscated_id)
+
+    @pg_error_handler
+    def create(self, obj: UrlMapCreate) -> UrlMap:
+        db_obj = self.model(**obj.model_dump())
+        # Populate defaults required before flushing
+        db_obj.create_date = datetime.now(timezone.utc)
+        
+        self.db_session.add(db_obj)
+        self.db_session.flush() 
+        
+        # Now generate the actual short code and update
+        db_obj.short_url_code = self._generate_short_code(db_obj.id)
+        
+        self.db_session.commit()
+        self.db_session.refresh(db_obj)
+        return db_obj
+
+def get_url_map_service(db_session: Annotated[Session, Depends(get_db_session)]) -> UrlMapService:
+    """
+    Dependency function to provide an instance of UrlMapService with a database session.
+    """
+    return UrlMapService(db_session)
