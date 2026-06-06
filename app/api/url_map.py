@@ -32,10 +32,21 @@ async def get_url_map(
         short_code: str,
         url_map_service: Annotated[UrlMapService, Depends(get_url_map_service)]):
 
+    cached = await url_map_service.get_by_short_code(short_code)
+    if cached is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="URL not found")
+
+    return RedirectResponse(url=cached["original_url"], status_code=status.HTTP_302_FOUND)
+
+# This endpoint is intended for benchmarking purposes, it bypasses the cache layer to directly test the database retrieval performance.
+@router.get("/no-cache/{short_code}", response_class=RedirectResponse)
+async def get_url_map_no_cache(
+        short_code: str,
+        url_map_service: Annotated[UrlMapService, Depends(get_url_map_service)]):
+
     url_map = url_map_service.search_first(UrlMap.short_url_code == short_code)
 
     if url_map is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="URL not found")
 
     return RedirectResponse(url=url_map.original_url, status_code=status.HTTP_302_FOUND)
-

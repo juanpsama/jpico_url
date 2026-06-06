@@ -1,7 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import computed_field
 
-
 class Settings(BaseSettings):
 
     app_name: str = "jpico_url"
@@ -17,8 +16,9 @@ class Settings(BaseSettings):
 
     URL_BASE: str = "http://localhost:8000/"
 
-    # REDIS_HOST: str
-    # REDIS_PORT: int
+    REDIS_HOST: str
+    REDIS_PORT: int
+    CACHED_TTL_SECONDS : int
 
     # # Worker
     # BATCH_SIZE: int|None=None
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         return (
-            f"postgresql+psycopg2://{self.POSTGRES_USER}:"
+            f"postgresql+psycopg://{self.POSTGRES_USER}:"
             f"{self.POSTGRES_PASSWORD}@"
             f"{self.POSTGRES_SERVER}:"
             f"{self.POSTGRES_PORT}/"

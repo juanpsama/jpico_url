@@ -5,7 +5,7 @@ from .config import settings
 
 # connect_args = {"check_same_thread": False} # Specifically for sqlite
 # connect_args = {}
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_size=10, max_overflow=20, pool_recycle=3600)
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_size=20, max_overflow=100, pool_recycle=3600, pool_pre_ping=True)
 
 def get_db_session() -> Generator[scoped_session, None, None]:
     db = Session(bind=engine)

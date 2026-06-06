@@ -1,13 +1,16 @@
 from datetime import datetime, timezone
+from typing import Optional
 from typing_extensions import Annotated
 
 from fastapi.params import Depends
 from sqlmodel import Session
 
+from app.core.cache import get_redis_cache
 from app.core.db import get_db_session
 from app.models.url_map import UrlMap, UrlMapCreate, UrlMapPublic
 from app.services.base_service import BaseService
 from app.services.pg_error_handler import pg_error_handler
+from app.core.redis_cache import RedisCache
 
 BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MAX_VAL = 62 ** 4  # 14776336
@@ -20,8 +23,9 @@ class UrlMapService(BaseService[UrlMapPublic, UrlMapCreate, UrlMapCreate]):
     CRUD operations for the UrlMap model.
     """
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, cache: Optional[RedisCache] = None):
         super().__init__(UrlMap, db_session)
+        self.cache = cache
 
     def _encode_base62(self, num: int) -> str:
         """Encodes an integer into a 4-character Base62 string."""
@@ -61,8 +65,24 @@ class UrlMapService(BaseService[UrlMapPublic, UrlMapCreate, UrlMapCreate]):
         self.db_session.refresh(db_obj)
         return db_obj
 
-def get_url_map_service(db_session: Annotated[Session, Depends(get_db_session)]) -> UrlMapService:
+    async def get_by_short_code(self, short_code: str) -> str | None:
+        if self.cache is None:
+            record = self.search_first(UrlMap.short_url_code == short_code)
+            if record is None:
+                return None
+            return {"id": str(record.id), "original_url": record.original_url, "short_url_code": record.short_url_code}
+
+        def loader(_key: str) -> Optional[dict[str, str]]:
+            record = self.search_first(UrlMap.short_url_code == short_code)
+            if record is None:
+                return None
+            return {"id": str(record.id), "original_url": record.original_url, "short_url_code": record.short_url_code}
+
+        cached, _hit, _latency = await self.cache.get(short_code, loader)
+        return cached
+
+def get_url_map_service(db_session: Annotated[Session, Depends(get_db_session)], cache: Annotated[RedisCache, Depends(get_redis_cache)]) -> UrlMapService:
     """
     Dependency function to provide an instance of UrlMapService with a database session.
     """
-    return UrlMapService(db_session)
+    return UrlMapService(db_session, cache)
