@@ -12,7 +12,7 @@ const PRIME = 748_361;
 const COUNTER_START = 1;
 const COUNTER_END = 500_000;
 
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = 'http://127.0.0.1:8080';
 
 const shortCodeTrend = new Trend('short_code_duration');
 const errorRate = new Rate('error_rate');
