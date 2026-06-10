@@ -7,10 +7,11 @@ from sqlmodel import Session
 
 from app.core.cache import get_redis_cache
 from app.core.db import get_db_session
+from app.core.cache import RedisCache
 from app.models.url_map import UrlMap, UrlMapCreate, UrlMapPublic
-from app.services.base_service import BaseService
-from app.services.pg_error_handler import pg_error_handler
-from app.core.redis_cache import RedisCache
+
+from .base_service import BaseService
+from .pg_error_handler import pg_error_handler
 
 BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MAX_VAL = 62 ** 4  # 14776336
