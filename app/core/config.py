@@ -14,8 +14,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
 
-    URL_BASE: str = "http://localhost:8000/"
-
     REDIS_HOST: str
     REDIS_PORT: int
     CACHED_TTL_SECONDS : int
