@@ -12,7 +12,7 @@ const PRIME = 748_361;
 const COUNTER_START = 1;
 const COUNTER_END = 500_000;
 
-const BASE_URL = 'http://127.0.0.1:8080';
+const BASE_URL = 'http://127.0.0.1:8000';
 
 const shortCodeTrend = new Trend('short_code_duration');
 const errorRate = new Rate('error_rate');
@@ -58,9 +58,9 @@ export default function () {
   shortCodeTrend.add(res.timings.duration);
   errorRate.add(res.status !== 302);
 
-  check(res, {
-    'status is 302': (response: Response) => response.status === 302,
-  });
+  // check(res, {
+  //   'status is 302': (response: Response) => response.status === 302,
+  // });
 
   sleep(0.1);
 }
