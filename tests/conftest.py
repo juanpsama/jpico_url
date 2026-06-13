@@ -5,6 +5,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.core.db import get_db_session
+from app.services.url_map_service import UrlMapService, get_redirect_service
 
 # Use an in-memory SQLite database for tests.
 # StaticPool ensures the same in-memory database connection is reused
@@ -38,7 +39,11 @@ def client_fixture(session: Session):
     def override_get_db_session():
         yield session
 
+    def override_get_redirect_service():
+        return UrlMapService(session, None)
+
     app.dependency_overrides[get_db_session] = override_get_db_session
+    app.dependency_overrides[get_redirect_service] = override_get_redirect_service
     with TestClient(app, follow_redirects=False) as client:
         yield client
     app.dependency_overrides.clear()
