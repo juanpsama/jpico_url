@@ -17,9 +17,9 @@ const BASE_URL = 'http://127.0.0.1:8000';
 const shortCodeTrend = new Trend('short_code_duration');
 const errorRate = new Rate('error_rate');
 
-function encodeBase62(num: number): string {
+function encodeBase62(num) {
   if (num === 0) return BASE62_ALPHABET[0].repeat(4);
-  const chars: string[] = [];
+  const chars = [];
   while (num > 0) {
     chars.push(BASE62_ALPHABET[num % 62]);
     num = Math.floor(num / 62);
@@ -28,11 +28,11 @@ function encodeBase62(num: number): string {
   return chars.reverse().join('');
 }
 
-function generateShortCode(counter: number): string {
+function generateShortCode(counter) {
   return encodeBase62((counter * PRIME) % MAX_VAL);
 }
 
-function randomShortCode(): string {
+function randomShortCode() {
   const counter = Math.floor(Math.random() * (COUNTER_END - COUNTER_START + 1)) + COUNTER_START;
   return generateShortCode(counter);
 }
@@ -41,9 +41,9 @@ function randomShortCode(): string {
 
 export const options = {
   stages: [
-    { duration: '10s', target: 10 },   // Warm-up
-    { duration: '10s', target: 50 },   // Ramp-up
-    { duration: '20s', target: 100 },  // Peak load
+    { duration: '10s', target: 100 },   // Warm-up
+    { duration: '10s', target: 500 },   // Ramp-up
+    { duration: '20s', target: 1000 },  // Peak load
     { duration: '10s', target: 0 },    // Cool-down
   ],
   thresholds: {
@@ -54,7 +54,7 @@ export const options = {
 
 export default function () {
   const shortCode = randomShortCode();
-  const res = http.get(`${BASE_URL}/${shortCode}`);
+  const res = http.get(`${BASE_URL}/${shortCode}`, {redirects:0});
   shortCodeTrend.add(res.timings.duration);
   errorRate.add(res.status !== 302);
 
