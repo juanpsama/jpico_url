@@ -158,18 +158,21 @@ class RedisCache:
             self._misses = 0
             self._stampedes_suppressed = 0
 
+_redis_client: aioredis.Redis | None = None
+
+
 async def get_redis_cache():
-    client = aioredis.Redis(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        decode_responses=True,
-    )
+    global _redis_client
+    if _redis_client is None:
+        _redis_client = aioredis.Redis(
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
+            decode_responses=True,
+        )
     cache = RedisCache(
-        redis_client=client,
+        redis_client=_redis_client,
         prefix="cache:url:",
         ttl=settings.CACHED_TTL_SECONDS,
     )
-    try:
-        yield cache
-    finally:
-        await client.close()
+    yield cache
+    # Client is module-level singleton — do not close per-request
