@@ -3,10 +3,10 @@ from typing import Optional
 from typing_extensions import Annotated
 
 from fastapi.params import Depends
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.core.cache import get_redis_cache
-from app.core.db import get_db_session
+from app.core.db import engine, get_db_session
 from app.core.cache import RedisCache
 from app.models.url_map import UrlMap, UrlMapCreate, UrlMapPublic
 
@@ -74,10 +74,13 @@ class UrlMapService(BaseService[UrlMapPublic, UrlMapCreate, UrlMapCreate]):
             return {"id": str(record.id), "original_url": record.original_url, "short_url_code": record.short_url_code}
 
         def loader(_key: str) -> Optional[dict[str, str]]:
-            record = self.search_first(UrlMap.short_url_code == short_code)
-            if record is None:
-                return None
-            return {"id": str(record.id), "original_url": record.original_url, "short_url_code": record.short_url_code}
+            with Session(engine) as session:
+                record = session.exec(
+                    select(UrlMap).where(UrlMap.short_url_code == short_code)
+                ).first()
+                if record is None:
+                    return None
+                return {"id": str(record.id), "original_url": record.original_url, "short_url_code": record.short_url_code}
 
         cached, _hit, _latency = await self.cache.get(short_code, loader)
         return cached
@@ -87,3 +90,12 @@ def get_url_map_service(db_session: Annotated[Session, Depends(get_db_session)],
     Dependency function to provide an instance of UrlMapService with a database session.
     """
     return UrlMapService(db_session, cache)
+
+
+def get_redirect_service(cache: Annotated[RedisCache, Depends(get_redis_cache)]) -> UrlMapService:
+    """
+    Dependency function for the redirect route.
+    Inject only the cache so cache hits never consume a DB connection.
+    The loader inside get_by_short_code opens a short-lived session only on cache miss.
+    """
+    return UrlMapService(None, cache)

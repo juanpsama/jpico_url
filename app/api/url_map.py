@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 
 from app.models.url_map import UrlMap, UrlMapCreate, UrlMapPagination, UrlMapPublic
-from app.services.url_map_service import UrlMapService, get_url_map_service
+from app.services.url_map_service import UrlMapService, get_redirect_service, get_url_map_service
 
 
 router = APIRouter(tags=["Url Mapping"])
@@ -30,7 +30,7 @@ async def create_url_map(
 @router.get("/{short_code}", response_class=RedirectResponse)
 async def get_url_map(
         short_code: str,
-        url_map_service: Annotated[UrlMapService, Depends(get_url_map_service)]):
+        url_map_service: Annotated[UrlMapService, Depends(get_redirect_service)]):
 
     cached = await url_map_service.get_by_short_code(short_code)
     if cached is None:
