@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     CACHED_TTL_SECONDS : int
 
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    JWT_REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
+    JWT_ALGORITHM: str = "HS256"
+
     # # Worker
     # BATCH_SIZE: int|None=None
     # POLL_INTERVAL_MS: int|None=None

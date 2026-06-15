@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import TimeoutError
 
+from .api import auth
 from .api import health
 from .api import url_map
 from .api import web
@@ -22,6 +23,7 @@ async def pool_timeout_handler(request: Request, exc: TimeoutError):
     )
 
 
+app.include_router(auth.router)
 app.include_router(url_map.router)
 app.include_router(health.router, prefix="/health")
 app.include_router(web.router, prefix="/web")
