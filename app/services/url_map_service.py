@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 from typing_extensions import Annotated
+from sqlalchemy import func
 
 from fastapi.params import Depends
 from sqlmodel import Session, select
@@ -50,23 +51,38 @@ class UrlMapService(BaseService[UrlMapPublic, UrlMapCreate, UrlMapCreate]):
         obfuscated_id = (base_id * PRIME) % MAX_VAL
         return self._encode_base62(obfuscated_id)
 
+    def list_by_owner(self, owner_id: int, page: int = 0, per_page: int = 10, order_by: str | None = None):
+        offset = page * per_page
+        total_count = self.db_session.exec(
+            select(func.count(self.model.id)).where(self.model.owner_id == owner_id)
+        ).one()
+        query = select(self.model).where(self.model.owner_id == owner_id)
+        if order_by:
+            order_parts = order_by.split(":")
+            column_name = order_parts[0]
+            direction = order_parts[1].lower() if len(order_parts) > 1 else "asc"
+            if hasattr(self.model, column_name):
+                column = getattr(self.model, column_name)
+                query = query.order_by(column.asc() if direction == "asc" else column.desc())
+        data = self.db_session.exec(query.offset(offset).limit(per_page)).all()
+        return {"page": page, "per_page": per_page, "total": total_count, "data": data}
+
     @pg_error_handler
-    def create(self, obj: UrlMapCreate) -> UrlMap:
+    def create(self, obj: UrlMapCreate, owner_id: int | None = None) -> UrlMap:
         db_obj = self.model(**obj.model_dump())
-        # Populate defaults required before flushing
         db_obj.create_date = datetime.now(timezone.utc)
-        
+        db_obj.owner_id = owner_id
+
         self.db_session.add(db_obj)
-        self.db_session.flush() 
-        
-        # Now generate the actual short code and update
+        self.db_session.flush()
+
         db_obj.short_url_code = self._generate_short_code(db_obj.id)
-        
+
         self.db_session.commit()
         self.db_session.refresh(db_obj)
         return db_obj
 
-    async def get_by_short_code(self, short_code: str) -> str | None:
+    async def get_by_short_code(self, short_code: str) -> dict[str, str] | None:
         if self.cache is None:
             record = self.search_first(UrlMap.short_url_code == short_code)
             if record is None:
