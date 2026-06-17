@@ -194,6 +194,67 @@ button:hover {
     box-shadow: 2px 2px 0px var(--text);
 }
 
+/* ── Login ────────────────────────────── */
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.login-form .input-wrap {
+    border: var(--border-width) solid var(--text);
+    box-shadow: 2px 2px 0px var(--text);
+    background: var(--bg);
+}
+
+.login-heading {
+    font-family: var(--font-ui);
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-error {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--accent);
+    min-height: 1.2em;
+}
+
+.login-footer {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.login-footer a {
+    color: var(--text);
+}
+
+.login-footer a:hover {
+    opacity: 0.7;
+}
+
+.container--narrow {
+    max-width: 480px;
+    margin: 0 auto 2rem;
+}
+
+/* ── Dashboard ───────────────────────── */
+
+.dashboard-info {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+}
+
 /* ── Footer ───────────────────────────── */
 
 footer {
@@ -284,6 +345,10 @@ footer {
         flex-direction: column;
     }
 
+    .container--narrow {
+        margin: 0 auto 2rem;
+    }
+
     .input-wrap {
         min-width: unset;
         max-width: unset;
@@ -298,10 +363,6 @@ footer {
 /* ── Responsive: Tablet (641px–1024px) ── */
 
 @media (min-width: 641px) and (max-width: 1024px) {
-
-    .container {
-        margin: 0 8% 2rem 8%;
-    }
 
     .title {
         padding: 2rem 6%;

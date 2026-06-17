@@ -1,0 +1,19 @@
+{% extends "components/base.html" %}
+
+{% block body_attrs %} id="dashboard"{% endblock %}
+
+{% block content %}
+    <section class="title">
+        <h1>Welcome, <span id="welcome-username">—</span></h1>
+        <h3>Manage your links and view analytics from your dashboard.</h3>
+    </section>
+
+    <div class="container container--narrow shadow">
+        <div class="dashboard-info">
+            <p><strong>Username:</strong> <span id="info-username"></span></p>
+            <p><strong>Email:</strong> <span id="info-email"></span></p>
+            <p><strong>Joined:</strong> <span id="info-joined"></span></p>
+        </div>
+        <button class="shadow" id="logout-btn">Log out</button>
+    </div>
+{% endblock %}
