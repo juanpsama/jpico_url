@@ -10,17 +10,23 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/", response_class=HTMLResponse)
 async def web_home(request: Request):
     return templates.TemplateResponse(
-        request=request,name="main.html", context={"title": ""}
+        request=request, name="main.html", context={"title": ""}
     )
 
 @router.get("/login", response_class=HTMLResponse)
 async def web_login(request: Request):
     return templates.TemplateResponse(
-        request=request,name="login.html", context={"title": " — Login"}
+        request=request, name="login.html", context={"title": " — Login"}
+    )
+
+@router.get("/register", response_class=HTMLResponse)
+async def web_register(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="register.html", context={"title": " — Register"}
     )
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def web_dashboard(request: Request):
     return templates.TemplateResponse(
-        request=request,name="dashboard.html", context={"title": " — Dashboard"}
+        request=request, name="dashboard.html", context={"title": " — Dashboard"}
     )
