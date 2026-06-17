@@ -1,0 +1,33 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+    <div class="container container--narrow shadow">
+        <form class="login-form" id="register-form">
+            <h2 class="login-heading">Create an account</h2>
+            <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M20 21a8 8 0 1 0-16 0"/>
+                </svg>
+                <input name="username" placeholder="Username" required autocomplete="username" minlength="3">
+            </div>
+            <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M22 7l-10 7L2 7"/>
+                </svg>
+                <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input type="password" name="password" placeholder="Password" required autocomplete="new-password" minlength="8">
+            </div>
+            <div id="register-error" class="login-error"></div>
+            <button class="shadow" type="submit">Register</button>
+            <p class="login-footer">Already have an account? <a href="{{ url_for('web_login') }}">Log in</a></p>
+        </form>
+    </div>
+{% endblock %}
