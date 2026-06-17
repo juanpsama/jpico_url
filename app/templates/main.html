@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jpico url</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Intel+One+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/global.css">
-    <script defer src="/static/app.js"></script>
-</head>
-<body>
-    {% include "components/navbar.html" %}
+{% extends "components/base.html" %}
 
+{% block content %}
     <section class="title">
         <h1>Understand what clicks with your audience</h1>
         <h3>jpico_url is a simple approach to URL management for create, share, and track short links. Use it to spot which channels are pulling their weight so you can double down where it counts.</h3>
@@ -35,7 +23,4 @@
             Shorten
         </button>
     </div>
-
-    {% include "components/footer.html" %}
-</body>
-</html>
+{% endblock %}
