@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     REDIS_HOST: str
     REDIS_PORT: int
+    REDIS_PASSWORD: str
     CACHED_TTL_SECONDS : int
 
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 15

@@ -32,11 +32,7 @@ class RedisCache:
         lock_ttl_ms: int = 2000,
         wait_poll_ms: int = 25,
     ) -> None:
-        self.redis = redis_client or aioredis.Redis(
-            host="localhost",
-            port=6379,
-            decode_responses=True,
-        )
+        self.redis = redis_client
         self.prefix = prefix
         self.ttl = ttl
         self.lock_ttl_ms = lock_ttl_ms
@@ -167,6 +163,7 @@ async def get_redis_cache():
         _redis_client = aioredis.Redis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
+            password=settings.REDIS_PASSWORD,
             decode_responses=True,
         )
     cache = RedisCache(
