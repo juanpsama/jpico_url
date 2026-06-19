@@ -22,9 +22,9 @@ class Settings(BaseSettings):
     JWT_REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
     JWT_ALGORITHM: str = "HS256"
 
-    # # Worker
-    # BATCH_SIZE: int|None=None
-    # POLL_INTERVAL_MS: int|None=None
+    FLUSH_INTERVAL_SECONDS: float = 5.0
+    BATCH_SIZE: int = 500
+    MAX_QUEUE_SIZE: int = 100_000
 
 
     @computed_field  # type: ignore[prop-decorator]
