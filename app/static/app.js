@@ -131,102 +131,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 })();
 
-/* ── Shorten ─────────────────────────── */
-
-(function () {
-    var input = document.getElementById('url-input');
-    var btn = document.getElementById('shorten-btn');
-    var resultEl = document.getElementById('shorten-result');
-    var linkEl = document.getElementById('result-link');
-    var copyBtn = document.getElementById('copy-btn');
-    var listEl = document.getElementById('links-list');
-    // if (!input || !btn || !resultEl || !linkEl || !copyBtn || !listEl) return;
-
-    function prependLink(shortCode) {
-        var shortUrl = window.location.origin + '/' + shortCode;
-        var div = document.createElement('div');
-        div.className = 'link-entry shorten-result';
-
-        div.innerHTML =
-            '<span class="result-wrap shadow">'+
-                `<a id="result-link" href='${shortUrl}' target="_blank" rel="noopener">${shortUrl}</a>`+
-            '</span>'+
-            '<button id="copy-btn" class="shadow" title="Copy to clipboard">'+
-                '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'+
-                    '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>'+
-                    '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'+
-                '</svg>'+
-            '</button>'
-        div.querySelector('button').addEventListener('click', function () {
-            navigator.clipboard.writeText(shortUrl);
-        });
-        listEl.insertBefore(div, listEl.firstChild);
-    }
-
-    function renderLinks(links) {
-        try{
-            Object.keys(links).forEach(key => {
-                let shortCode = links[key]  
-                prependLink(shortCode)                
-            });
-        }catch(e){
-            console.log(e)
-        }
-    }
-
-    renderLinks(getLinks());
-
-    var btnHtml = btn.innerHTML;
-
-    function setLoading(loading) {
-        btn.disabled = loading;
-        if (loading) {
-            input.value = '';
-            btn.innerHTML = '<span class="spinner"></span> Shortening\u2026';
-        } else {
-            btn.innerHTML = btnHtml;
-        }
-    }
-
-    btn.addEventListener('click', function () {
-        var url = input.value.trim();
-        if (!url) return;
-
-        var cached = findLink(url);
-        if (cached) {
-            input.value = '';
-            prependLink(cached);
-            return;
-        }
-
-        setLoading(true);
-
-        fetch('/shorten', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ original_url: url }),
-        })
-            .then(function (res) {
-                if (!res.ok) {
-                    return res.json().then(function (body) {
-                        throw new Error(body.detail || 'Failed to shorten');
-                    });
-                }
-                return res.json();
-            })
-            .then(function (data) {
-                saveLink(url, data.short_url_code);
-                prependLink(data.short_url_code);
-            })
-            .catch(function (err) {
-                console.error('Shorten failed:', err);
-            })
-            .finally(function () {
-                setLoading(false);
-            });
-    });
-})();
-
 /* ── Dashboard ──────────────────────── */
 
 (function () {
@@ -267,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function (e) {
+            console.log("hey im here")
             e.preventDefault();
             clearToken();
             window.location.href = '/web/';
