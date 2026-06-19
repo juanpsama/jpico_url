@@ -306,6 +306,26 @@ button:disabled {
     line-height: 0;
 }
 
+/* ── Copied toast ───────────────────── */
+
+#message {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2e7d32;
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
+
+#message::after {
+    content: "Copied!";
+}
+
+#message.copied {
+    opacity: 1;
+}
+
 /* ── Links history list ──────────────── */
 
 #links-list {
@@ -470,16 +490,7 @@ footer {
         width: 100%;
     }
 
-    button {
+    #shorten-btn {
         width: 100%;
-    }
-}
-
-/* ── Responsive: Tablet (641px–1024px) ── */
-
-@media (min-width: 641px) and (max-width: 1024px) {
-
-    .title {
-        padding: 2rem 6%;
     }
 }
