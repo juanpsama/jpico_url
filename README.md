@@ -2,7 +2,7 @@
 
 A URL shortener built as a hands-on study-case for practicing scaling techniques and backend performance knowledge. The project explores caching strategies, database connection pool management, and load testing under high concurrency.
 
-**Stack:** FastAPI + SQLModel + PostgreSQL + Redis + Alembic
+**Stack:** FastAPI + PostgreSQL + Redis
 
 ## Benchmark results
 
