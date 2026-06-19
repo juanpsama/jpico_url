@@ -3,7 +3,7 @@ from fastapi.params import Depends
 from sqlalchemy import func
 from sqlmodel import Session, select
 
-from app.core.db import get_db_session, get_engine
+from app.core.db import get_db_session
 from app.models.click_event import ClickEvent, ClickEventCreate, ClickEventPagination, ClickEventPublic, UrlStatsPublic
 
 from .base_service import BaseService
@@ -46,20 +46,6 @@ class ClickEventService(BaseService[ClickEventPublic, ClickEventCreate, ClickEve
             total_clicks=total,
             last_clicked_at=last.clicked_at if last else None,
         )
-
-
-def record_click(url_map_id: int, ip: str | None, user_agent: str | None, referer: str | None):
-    with Session(get_engine()) as session:
-        service = ClickEventService(session)
-        service.create(
-            ClickEventCreate(
-                url_map_id=url_map_id,
-                ip_address=ip,
-                user_agent=user_agent,
-                referer=referer,
-            )
-        )
-
 
 def get_click_event_service(db_session: Annotated[Session, Depends(get_db_session)]) -> ClickEventService:
     return ClickEventService(db_session)
