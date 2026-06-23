@@ -43,36 +43,37 @@ At 200 concurrent VUs the cache delivers roughly **1.6x lower latency** than the
 | Metric | Value |
 |---|---|
 | Error rate | **0.00%** (0 / 24832) |
-| Throughput | **403 req/s** |
-| Avg | **4.03 s** |
-| Median | 3.53 s |
-| p(90) | **8.82 s** |
-| p(95) | **9.00 s** |
-| Max | **9.50 s** |
+| Throughput | **909 req/s** |
+| Avg | **1.35 s** |
+| Median | 1.09 s |
+| p(90) | **3.26 s** |
+| p(95) | **3.37 s** |
+| Max | **3.8 s** |
 
 
 ### No-cache route (original, for reference)
 
 | Metric | Value |
 |---|---|
-| Error rate | 6.33% (821 / 12966) |
-| Throughput | 154 req/s |
-| Avg | 9.64 s |
-| Median | 5.02 s |
-| p(90) | 33.99 s |
-| p(95) | 35.14 s |
-| Max | 41.74 s |
-| Interrupted | 579 |
+| Error rate | 0.05% (13 / 21750) |
+| Throughput | 274.54 req/s |
+| Avg | 5.74 s |
+| Median | 3.25 s |
+| p(90) | 19.16 s |
+| p(95) | 24.21 s |
+| Max | 27.84 s |
+| Interrupted | 13 |
 
 ## Conclusion
 
 At 5000 concurrent VUs, the cache layer is the difference between a functional service and a degraded one:
 
-- **Error rate:** 0.00% (cache) vs 6.33% (no-cache) — zero failures vs 821.
-- **Throughput:** 403 req/s (cache) vs 154 req/s (no-cache) — **2.6x** more work done.
-- **Avg latency:** 4.03 s (cache) vs 9.64 s (no-cache) — **2.4x** faster.
-- **p(95) tail:** 9.00 s (cache) vs 35.14 s (no-cache) — **3.9x** better.
-- **Interrupted iterations:** 0 (cache) vs 579 (no-cache) — all requests completed under cache.
+- **Error rate:** 0.00% (cache) vs 0.05% (no-cache) — zero failures vs 13.
+- **Throughput:** 909 req/s (cache) vs 274.54 req/s (no-cache) — **3.3x** more work done.
+- **Avg latency:** 1.35 s (cache) vs 5.74 s (no-cache) — **4.3x** faster.
+- **p(95) tail:** 3.37 s (cache) vs 24.21 s (no-cache) — **7.2x** better.
+- **Max latency:** 3.8 s (cache) vs 27.84 s (no-cache) — **7.3x** tighter ceiling.
+- **Interrupted iterations:** 0 (cache) vs 13 (no-cache) — all requests completed under cache.
 
 The no-cache route is bound by the DB connection pool (pool_size=20, max_overflow=100). Under heavy load, most requests queue waiting for a connection, causing cascading latency and eventually dropped requests. Redis absorbs the read traffic on the cache path, keeping the DB pool free for writes and cache fills.
 
