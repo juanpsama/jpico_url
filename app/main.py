@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import TimeoutError
 
 from .api import auth
@@ -30,6 +31,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+origins = [
+    "http://localhost:5173/",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
@@ -40,6 +54,9 @@ async def pool_timeout_handler(request: Request, exc: TimeoutError):
         content={"detail": "Service temporarily unavailable, try again later"},
     )
 
+@app.get("/")
+def root():
+    return RedirectResponse(url="/web/")
 
 app.include_router(auth.router)
 app.include_router(url_map.router)
