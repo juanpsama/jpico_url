@@ -1,0 +1,17 @@
+.venv
+venv
+__pycache__
+*.pyc
+.env
+.env.save
+.git
+.gitignore
+.pytest_cache
+.benchmarks
+README.md
+AGENTS.md
+commands.md
+render.env
+*.md
+.idea
+.vscode
